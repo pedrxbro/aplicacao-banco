@@ -1,11 +1,14 @@
 package br.univali.cc.poo.ex1.dominio;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ContaCorrente {
     private boolean especial;
     private double limite;
     private int numero;
     private double saldo;
-    private Movimentacao[] movimentacoes;
+    private List<Movimentacao> movimentacoes = new ArrayList<>();
 
     public ContaCorrente(int numero, double saldoInicial, double limite) {
         this.especial = true;
@@ -49,16 +52,8 @@ public class ContaCorrente {
     }
     
     private void criarMovimentacao(String descricao, char tipo, double valor) {
-        if (movimentacoes == null) {
-            this.movimentacoes = new Movimentacao[999];
-        }
         Movimentacao movimentacao = new Movimentacao(descricao, tipo, valor);
-        for(int x=0; x <movimentacoes.length; x++) {
-            if (movimentacoes[x] == null) {
-                movimentacoes[x] = movimentacao;
-                break;
-            }
-        }
+        movimentacoes.add(movimentacao);
     }
     
     public double getSaldo() {
@@ -69,14 +64,14 @@ public class ContaCorrente {
     }
     
     public String emitirExtrato() {
-        String extrato = "Conta nº "+this.numero;
-        for (Movimentacao movimentacao:movimentacoes) {
-            if (movimentacao != null) {
-                extrato += "\n "+movimentacao.getMovimentacao();
-            }
+        StringBuilder extrato = new StringBuilder("Conta nº " + this.numero);
+
+        for (Movimentacao movimentacao : movimentacoes) {
+            extrato.append("\n ").append(movimentacao.getMovimentacao());
         }
-        extrato += "\n "+"Saldo final: "+this.getSaldo();
-        return extrato;
+
+        extrato.append("\n Saldo final: R$ ").append(this.getSaldo());
+        return extrato.toString();
     }
     
 }

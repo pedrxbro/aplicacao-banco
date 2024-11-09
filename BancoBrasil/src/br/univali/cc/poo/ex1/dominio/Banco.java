@@ -1,31 +1,34 @@
 package br.univali.cc.poo.ex1.dominio;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class Banco {
     private String nome;
     private int numero;
-    private ContaCorrente[] contas;
+    private Map<Integer, ContaCorrente> contas;
 
 
     public Banco(String nome, int numero) {
         this.nome = nome;
         this.numero = numero;
-        this.contas = new ContaCorrente[999];
+        this.contas = new HashMap<>();
     }
 
     public void criarConta(double saldoInicial, int numero) throws MesmoNumContasException {
-        if(contas[numero] != null) {
+        if (contas.containsKey(numero)) {
             throw new MesmoNumContasException();
         }
         ContaCorrente conta = new ContaCorrente(numero, saldoInicial);
-        this.contas[numero] = conta;
+        this.contas.put(numero, conta);
     }
 
     public void criarConta(double saldoInicial, int numero, double limite) throws MesmoNumContasException {
-        if(contas[numero] != null) {
+        if (contas.containsKey(numero)) {
             throw new MesmoNumContasException();
         }
         ContaCorrente conta = new ContaCorrente(numero, saldoInicial, limite);
-        this.contas[numero] = conta;
+        this.contas.put(numero, conta);
     }
 
     public void depositar(int numeroConta, double valor) throws ContaInexistenteException, ValorNegativoException {
@@ -70,12 +73,11 @@ public class Banco {
 
 
     private ContaCorrente localizarConta(int numeroConta) throws ContaInexistenteException {
-        for (ContaCorrente conta : contas) {
-            if (conta != null && conta.getNumeroConta() == numeroConta) {
-                return conta;
-            }
+        ContaCorrente conta = contas.get(numeroConta);
+        if (conta == null) {
+            throw new ContaInexistenteException();
         }
-        throw new ContaInexistenteException();
+        return conta;
     }
 
     public String emitirExtrato(int numeroConta) throws ContaInexistenteException{
