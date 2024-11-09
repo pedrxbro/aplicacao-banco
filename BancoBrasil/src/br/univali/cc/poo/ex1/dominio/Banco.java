@@ -60,7 +60,9 @@ public class Banco {
         ContaCorrente conta = this.localizarConta(numeroConta);
         if (valor < 0) {
             throw new ValorNegativoException();
-        } else if (conta.getSaldo() < valor) {
+        }
+
+        else if ((conta.getSaldo() + conta.getLimite()) < valor) {
             throw new SaldoInsuficienteException();
         }
         conta.sacar(valor);

@@ -26,7 +26,8 @@ public class ContaCorrente {
     protected int getNumeroConta() {
         return this.numero;
     }
-    
+
+
     public boolean depositar(double valor) {
         if (valor > 0) {
             this.saldo += valor;
@@ -35,10 +36,11 @@ public class ContaCorrente {
         }
         return false;
     }
-    
+
     public boolean sacar(double valor) throws SaldoInsuficienteException{
-        double saldoDisponivel = this.especial ? this.saldo+this.limite: this.saldo;
-        if (valor > 0 && saldoDisponivel >= valor){
+        double saldoDisponivel = this.especial ? this.saldo + this.limite : this.saldo;
+
+        if (valor > 0 && saldoDisponivel >= valor) {
             this.saldo -= valor;
             this.criarMovimentacao("Saque", 'D', valor);
             return true;
@@ -61,6 +63,9 @@ public class ContaCorrente {
     
     public double getSaldo() {
         return this.saldo;
+    }
+    public double getLimite(){
+        return this.limite;
     }
     
     public String emitirExtrato() {
