@@ -4,67 +4,80 @@ public class Banco {
     private String nome;
     private int numero;
     private ContaCorrente[] contas;
-    
-    private int proximoNumero = 0;
+
 
     public Banco(String nome, int numero) {
         this.nome = nome;
         this.numero = numero;
         this.contas = new ContaCorrente[999];
     }
-    
-    public void criarConta(double saldoInicial) {
-        int numero = this.proximoNumero+1;
-        ContaCorrente conta = new ContaCorrente(numero, saldoInicial);
-        this.contas[this.proximoNumero++] = conta;
-    }
-    
-    public void criarConta(double saldoInicial, double limite) {
-        int numero = this.proximoNumero+1;
-        ContaCorrente conta = new ContaCorrente(numero, saldoInicial, limite);
-        this.contas[this.proximoNumero++] = conta;
-    }
-    
-    public void depositar(int numeroConta, double valor) {
-        ContaCorrente conta = this.localizarConta(numeroConta);
-        if (conta != null) {
-            conta.depositar(valor);
+
+    public void criarConta(double saldoInicial, int numero) throws MesmoNumContasException {
+        if(contas[numero] != null) {
+            throw new MesmoNumContasException();
         }
+        ContaCorrente conta = new ContaCorrente(numero, saldoInicial);
+        this.contas[numero] = conta;
     }
-    
-    public void transferir(int numeroContaOrigem, int numeroContaDestino, double valor) {
+
+    public void criarConta(double saldoInicial, int numero, double limite) throws MesmoNumContasException {
+        if(contas[numero] != null) {
+            throw new MesmoNumContasException();
+        }
+        ContaCorrente conta = new ContaCorrente(numero, saldoInicial, limite);
+        this.contas[numero] = conta;
+    }
+
+    public void depositar(int numeroConta, double valor) throws ContaInexistenteException, ValorNegativoException {
+        ContaCorrente conta = this.localizarConta(numeroConta);
+        if (valor < 0) {
+            throw new ValorNegativoException();
+        }
+        conta.depositar(valor);
+    }
+
+    public void transferir(int numeroContaOrigem, int numeroContaDestino, double valor)
+            throws ContaInexistenteException, SaldoInsuficienteException, ValorNegativoException {
+
+        if (valor < 0) {
+            throw new ValorNegativoException();
+        }
+
         ContaCorrente contaOrigem = this.localizarConta(numeroContaOrigem);
         ContaCorrente contaDestino = this.localizarConta(numeroContaDestino);
-        if (contaOrigem != null && contaDestino != null) {
-            if (contaOrigem.sacar(valor)) {
-                contaDestino.depositar(valor);
-            }
+
+        if (contaOrigem.getSaldo() < valor) {
+            throw new SaldoInsuficienteException();
         }
-    }
-    
-    public void sacar(int numeroConta, double valor) {
-        ContaCorrente conta = this.localizarConta(numeroConta);
-        if (conta != null) {
-            conta.sacar(valor);
+
+        if (contaOrigem.sacar(valor)) {
+            contaDestino.depositar(valor);
         }
     }
 
-    private ContaCorrente localizarConta(int numeroConta) {
-        for (ContaCorrente conta:contas) {
-            if (conta != null && conta.getNumeroConta() == numeroConta){
+
+    public void sacar(int numeroConta, double valor) throws ContaInexistenteException, ValorNegativoException, SaldoInsuficienteException {
+        ContaCorrente conta = this.localizarConta(numeroConta);
+        if (valor < 0) {
+            throw new ValorNegativoException();
+        } else if (conta.getSaldo() < valor) {
+            throw new SaldoInsuficienteException();
+        }
+        conta.sacar(valor);
+    }
+
+
+    private ContaCorrente localizarConta(int numeroConta) throws ContaInexistenteException {
+        for (ContaCorrente conta : contas) {
+            if (conta != null && conta.getNumeroConta() == numeroConta) {
                 return conta;
             }
         }
-        return null;
+        throw new ContaInexistenteException();
     }
-    
-    public String emitirExtrato(int numeroConta) {
+
+    public String emitirExtrato(int numeroConta) throws ContaInexistenteException{
         ContaCorrente conta = this.localizarConta(numeroConta);
-        if (conta != null) {
-            return conta.emitirExtrato();
-        }
-        return "Conta não encontrada";
+        return conta.emitirExtrato();
     }
-    
-    
 }

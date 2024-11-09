@@ -12,7 +12,7 @@ public class ContaCorrente {
         this.limite = limite;
         this.numero = numero;
         this.saldo = saldoInicial;
-        this.criarMovimentacao("deposito inicial", 'C', saldoInicial);
+        this.criarMovimentacao("Depósito inicial", 'C', saldoInicial);
     }
     
     public ContaCorrente(int numero, double saldoInicial) {
@@ -20,7 +20,7 @@ public class ContaCorrente {
         this.limite = 0;
         this.numero = numero;
         this.saldo = saldoInicial;
-        this.criarMovimentacao("deposito inicial", 'C', saldoInicial);
+        this.criarMovimentacao("Depósito inicial", 'C', saldoInicial);
     }    
 
     protected int getNumeroConta() {
@@ -30,20 +30,20 @@ public class ContaCorrente {
     public boolean depositar(double valor) {
         if (valor > 0) {
             this.saldo += valor;
-            this.criarMovimentacao("deposito", 'C', valor);
+            this.criarMovimentacao("Deposito", 'C', valor);
             return true;
         }
         return false;
     }
     
-    public boolean sacar(double valor) {
+    public boolean sacar(double valor) throws SaldoInsuficienteException{
         double saldoDisponivel = this.especial ? this.saldo+this.limite: this.saldo;
         if (valor > 0 && saldoDisponivel >= valor){
             this.saldo -= valor;
-            this.criarMovimentacao("saque", 'D', valor);
+            this.criarMovimentacao("Saque", 'D', valor);
             return true;
         }
-        return false;
+        throw new SaldoInsuficienteException();
     }
     
     private void criarMovimentacao(String descricao, char tipo, double valor) {
